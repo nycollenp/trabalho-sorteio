@@ -1,57 +1,69 @@
+let randomNumber;
+let gameStarted = false;
 
-var resultados = 0;
-var tentativas = 0;
+document.getElementById('startButton').addEventListener('click', startGame);
 
-function refresh() {
-    //gera um numero aleatorio
-    tentativas = 0;
-    resultados = parseInt(Math.random() *100);
+document.getElementById('guessButton').addEventListener('click', makeGuess);
 
-    console.log(resultados)
-}
-refresh();
-
-
-document.addEventListener('DOMContentLoaded', (event) => {
-    const button = document.getElementById('send');
-    const inputField = document.getElementById('game');
-
-
-    function handleSubmit() {
-        var game = document.getElementById('game').value;
-
-        if(game > 100 || game < 1)
-            {
-                alert('Aposta inválida');
-                return;
-            }
-    
-            if (game > resultados)
-                {
-                    tentativas++;
-                    alert('O número sorteado é menor');
-                }
-    
-            else if (game < resultados)
-                {
-                    tentativas++;
-                    alert('O número sorteado é maior');
-                }
-    
-                else 
-                {
-                    alert('Parabéns você acertou!! Com ' +tentativas+ ' erros');
-                    refresh();
-                }
+document.getElementById('guessInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        makeGuess();
     }
-    
-    button.addEventListener('click', handleSubmit);
-
-    
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            handleSubmit();
-        }
-    });
 });
 
+function startGame() {
+    randomNumber = Math.floor(Math.random() * 100) + 1;
+
+    console.log("Número sorteado:", randomNumber);
+    
+    gameStarted = true;
+
+    document.getElementById('gameArea').style.display = 'block';
+
+    document.getElementById('log').innerHTML = '';
+
+    document.getElementById('message').innerHTML = '';
+
+    document.getElementById('guessInput').value = '';
+
+    document.getElementById('guessInput').focus();
+
+    document.getElementById('startButton').classList.add('hidden');
+}
+
+function makeGuess() {
+    if (!gameStarted) {
+        document.getElementById('message').innerText = 'O jogo ainda não foi iniciado!';
+        return;
+    }
+
+    const guess = parseInt(document.getElementById('guessInput').value);
+    if (isNaN(guess)) {
+        document.getElementById('message').innerText = 'Por favor, insira um número válido.';
+        return;
+    }
+
+    if (guess < 1 || guess > 100) {
+        document.getElementById('message').innerText = 'Por favor, insira um número entre 1 e 100.';
+        return;
+    }
+
+    document.getElementById('message').innerText = ''; // Limpa a mensagem de erro anterior
+
+    let log = document.getElementById('log');
+    if (guess < randomNumber) {
+        log.innerHTML += `<p>${guess} é menor que o número sorteado.</p>`;
+    } 
+    
+    else if (guess > randomNumber) {
+        log.innerHTML += `<p>${guess} é maior que o número sorteado.</p>`;
+    } 
+    
+    else {
+        log.innerHTML += `<p>Parabéns! Você acertou! O número era ${randomNumber}.</p>`;
+        gameStarted = false;
+    }
+
+    document.getElementById('guessInput').value = '';
+    document.getElementById('guessInput').focus();
+}
